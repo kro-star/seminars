@@ -1,16 +1,12 @@
 import React from 'react';
-import EventList from './components/EventList';
+import SeminarsList from './components/SeminarsList.js';
 import RootStoreProvider from './store/RootStoreProvider';
-import SeminarsForm from "./components/EventForm";
+import  './assets/scss/vars.scss';
 
 function App() {
     return (
         <RootStoreProvider>
-            <div>
-                <h1>Events</h1>
-                <SeminarsForm />
-                <EventList />
-            </div>
+                <SeminarsList />
         </RootStoreProvider>
     );
 }

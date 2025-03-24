@@ -1,0 +1,242 @@
+$shadow-color: #d8dde4;
+$main-text-color: #0e1142;
+$button-bg-color: #fef9ff;
+$card-bg: #ffffff;
+
+#root {
+  width: 100%;
+}
+
+.btn {
+  border-radius: 0.5rem;
+  border: none;
+  display: block;
+  background-color: $button-bg-color;
+  box-shadow: 0.25rem 0.25rem 0.5rem $shadow-color;
+  color: $main-text-color;
+  padding: 0.5rem 2rem;
+
+  &:hover {
+    background-color: #cbd2ea;
+  }
+
+  &:active {
+    background-color: #6581e1;
+    color: white;
+
+  }
+
+  &.btn-cancle {
+
+  }
+
+  &.btn-delete {
+
+  }
+
+  &.btn-add {
+  position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background-color: #ffff95;
+
+    &:hover{
+      background-color: #fdfd77;
+      border: none;
+
+    }
+    &:active{
+      border: none;
+
+      background-color: #fdfd65;
+    }
+  }
+
+  &.btn-update {
+    color: white;
+    background-color: #9c85f1;
+
+    &:hover {
+      background-color: #8060f4;
+    }
+
+    &:active {
+      background-color: #4e28dc;
+    }
+  }
+}
+
+
+.seminars {
+  max-width: 1920px;
+  margin: 0 auto;
+  width: 75vw;
+  padding-top: 1vw;
+  padding-bottom: 2vw;
+  position: relative;
+
+  h1 {
+    text-align: center;
+  }
+}
+
+
+.seminars-cards-item {
+  border-radius: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0.5rem 0.5rem 1rem $shadow-color;
+  padding: 2rem;
+  color: $main-text-color;
+  background-color: $card-bg;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.seminars-cards-item-container {
+  display: flex;
+  gap: 2vw;
+
+}
+
+.modal-body-img,
+.seminars-cards-item-img {
+  max-width: 30vw;
+  width: 30%;
+  height: auto;
+  padding-right: 1rem;
+
+  & img {
+    width: 100%;
+    height: auto;
+    border-radius: 1rem;
+  }
+
+}
+
+.seminars-cards-item-info-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 100%;
+}
+
+.modal-container {
+  padding: 0.75rem 2rem 2rem 2rem;
+  background-color: aliceblue;
+  color: $main-text-color;
+  border-radius: 1.5rem;
+  position: relative;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: $main-text-color;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0;
+  line-height: 1;
+  outline: none;
+
+  &:hover {
+    color: #555560;
+  }
+  &:active{
+    border: none;
+  }
+
+  span {
+    display: block;
+  }
+}
+
+.modal-body {
+  display: flex;
+
+}
+.seminars-cards-item-info,
+.modal-body-info{
+
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.modal-body-info {
+
+  .modal-body-info-text {
+    div {
+      margin-bottom: 10px;
+      width: 100%;
+      justify-content: space-between;
+      display: flex;
+
+      label {
+        display: block;
+        margin-right: 1rem;
+        width: 30%;
+      }
+
+      input, textarea {
+        display: block;
+        width: 70%;
+      }
+    }
+
+  }
+
+}
+.modal-body-img input,
+.modal-body-info input,
+.modal-body-info textarea{
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #9c85f1;
+  background-color: $card-bg;
+  &:hover{
+    border: 1px solid #8060f4;
+
+  }
+  &:active{
+    border: 1px solid #4e28dc
+  }
+  &.error{
+    border: 1px solid red;
+  }
+
+}
+.modal-body-img{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.no-seminars,
+.error-store{
+  padding: 1rem 0;
+  font-size: 16px;
+}
+.error-store{
+  color: red;
+}
+
+.no-seminars{
+  text-align: center;
+}

@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import SeminarsStore from './EventStore';
+import SeminarsStore from './SeminarsStore';
 
 class RootStore {
     seminarsStore: SeminarsStore;
