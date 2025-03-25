@@ -14,6 +14,7 @@ class SeminarsStore {
     loading: boolean = false;
     error: string = '';
     showModal: boolean = false;
+    showInfo: boolean = false;
     newUpdateSeminar: ISeminar = {
         id: '',
         title: '',
@@ -24,6 +25,7 @@ class SeminarsStore {
     };
     page: number = 1;
     seminarsPerPage: number = 5; // показ по 5 семинаров на странице
+    visibleSeminars: ISeminar[] = [];
     hasMore: boolean = true;
 
     constructor() {
@@ -33,11 +35,27 @@ class SeminarsStore {
     setSeminars = action((newSeminars: ISeminar[]) => {
         this.seminars = newSeminars;
     });
+    setVisibleSeminars = () => {
+        if(this.page * this.seminarsPerPage <= (Math.ceil(this.seminars.length/ this.seminarsPerPage) * this.seminarsPerPage))
+        {
+            const startSeminar = (this.page - 1) * this.seminarsPerPage;
+            const endSeminar = this.page * this.seminarsPerPage;
+            console.log('startSeminar', startSeminar);
+            console.log('endSeminar', endSeminar);
+            const newVisibleSeminars: ISeminar[] = (this.seminars.slice(startSeminar, endSeminar));
+            console.log('newVisibleSeminars', newVisibleSeminars);
+            this.visibleSeminars.push(...newVisibleSeminars);
+            console.log('this.visibleSeminars', this.visibleSeminars);
+        }
+    }
+    clearVisibleSeminars = () => {
+        this.visibleSeminars = [];
+    }
 
 
-    setPage = (page: number) => {
-        this.page = page;
-    };
+    setPage = action((fn: (prevPage: number) => number) => {
+        this.page = fn(this.page);
+    });
     checkHasMore = () => {
         this.hasMore = this.seminars.length > this.page * this.seminarsPerPage;
     };
@@ -103,16 +121,19 @@ class SeminarsStore {
             return dateComparison;
         });
     }
-    ToggleShowModal = () => {
+    toggleShowModal = () => {
         this.showModal = !this.showModal;
+    }
+    toggleShowInfo = () =>{
+        this.showInfo = !this.showInfo;
     }
    loadSeminars = async () => {
        runInAction(() => {
            this.loading = true;
        });
         try {
-            //const url = process.env.URL_API;
-            const responce = await fetch('http://localhost:3000/seminars', {
+            const url = process.env.URL_API;
+            const responce = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -136,13 +157,17 @@ class SeminarsStore {
             });
         } finally {
             runInAction(() => {
-                this.loading = false;
+                    this.loading = false;
             });
             this.sortSeminars();
+            this.clearVisibleSeminars();
+            this.setPage(()=> 1);
         }
     }
      addSeminar = async (newSeminar: Omit<ISeminar, 'id'>)=> {
-        this.loading = true;
+         runInAction(() => {
+             this.loading = true;
+         });
         this.error = null;
         const seminar = {
             title: newSeminar.title,
@@ -152,7 +177,8 @@ class SeminarsStore {
             photo: newSeminar.photo,
         }
         try {
-            const response = await fetch('http://localhost:3000/seminars', {
+            const url = process.env.URL_API;
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -168,19 +194,30 @@ class SeminarsStore {
             const addedSeminar = await response.json();
             this.seminars.push(addedSeminar);
         } catch (error: any) {
-            this.error = error.message;
-            console.error('Ошибка добавления семинара:', error);
+            runInAction(() => {
+                this.loading = false;
+                this.error = error.message;
+            });
+            //console.error('Ошибка добавления семинара:', error);
         } finally {
-            this.loading = false;
+            runInAction(() => {
+                this.loading = false;
+            });
             this.sortSeminars();
+            this.clearVisibleSeminars();
+            this.setPage(()=> 1);
+            this.setVisibleSeminars();
         }
     }
 
      deleteSeminar = async (id: string)  => {
-        this.loading = true;
+         runInAction(() => {
+             this.loading = true;
+         });
         this.error = null;
         try {
-            const response = await fetch(`http://localhost:3000/seminars/${id}`, {
+            const url = process.env.URL_API;
+            const response = await fetch(`${url}/${id}`, {
                 method: 'DELETE',
             });
 
@@ -193,16 +230,26 @@ class SeminarsStore {
             this.error = error.message;
             console.error('Ошибка удаления семинара:', error);
         } finally {
-            this.loading = false;
+            runInAction(() => {
+                this.loading = false;
+            });
+            this.loadSeminars();
+            this.clearVisibleSeminars();
+            this.setPage(()=> 1);
+            this.setVisibleSeminars();
+
         }
     }
 
 
     updateSeminar = async (seminar: ISeminar)=> {
-        this.loading = true;
+        runInAction(() => {
+            this.loading = true;
+        });
         this.error = null;
         try {
-            const response = await fetch(`http://localhost:3000/seminars/${seminar.id}`, {
+            const url = process.env.URL_API;
+            const response = await fetch(`${url}/${seminar.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -223,7 +270,13 @@ class SeminarsStore {
             this.error = error.message;
             console.error('Ошибка обновления семинара:', error);
         } finally {
-            this.loading = false;
+            runInAction(() => {
+                this.loading = false;
+            });
+            this.sortSeminars();
+            this.clearVisibleSeminars();
+            this.setPage(()=> 1);
+            this.setVisibleSeminars();
         }
     }
 

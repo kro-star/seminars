@@ -9,25 +9,18 @@ import {Preloader} from "./Preloader";
 
 const SeminarsList = observer(() => {
     const { seminarsStore } = useRootStore();
-    const {error, loadSeminars, seminars, deleteSeminar, ToggleShowModal, showModal,loading, hasMore,seminarsPerPage, page, setPage } = seminarsStore;
+    const {error, loadSeminars, seminars, deleteSeminar,visibleSeminars,toggleShowInfo, setVisibleSeminars,showInfo, toggleShowModal, showModal,loading,checkHasMore, hasMore,seminarsPerPage, page, setPage } = seminarsStore;
 
-    const [visibleSeminars, setVisibleSeminars] = useState([]);
 
-    useEffect(() => {
-        loadSeminars();
-    }, [seminarsStore]);
+    const [isloadingVisibleSeminars, setIsLoadingVisibleSeminars] = useState(true);
 
-    useEffect(()=>{
-        console.log('seminars', seminars);
-        console.log('loading',loading);
-        setVisibleSeminars(seminars.slice(0, page * seminarsPerPage));
 
-    }, [seminars, page]);
 
 
 
     const handleModalWindow = () => {
-        ToggleShowModal();
+        toggleShowModal();
+
     }
 
     const lastSeminarRef = useCallback(
@@ -36,7 +29,11 @@ const SeminarsList = observer(() => {
             if (node) {
                 const observer = new IntersectionObserver((entries) => {
                     if (entries[0].isIntersecting) {
-                        setPage(page + 1);
+                        setIsLoadingVisibleSeminars(false);
+                            setPage((prevPage) => prevPage + 1);
+                            setVisibleSeminars();
+                            setIsLoadingVisibleSeminars(true);
+                            checkHasMore();
                     }
                 });
                 observer.observe(node);
@@ -44,40 +41,37 @@ const SeminarsList = observer(() => {
         },
         [seminarsStore]
     );
-    /*const lastSeminarRef = useCallback(
-        (node) => {
-            if (loading) return;
-            if (observer.current) observer.current.disconnect();
-            observer.current = new IntersectionObserver(entries => {
-                if (entries[0].isIntersecting && hasMore) {
-                    setPage(page + 1);
-                    const endSeminar = page * seminarsPerPage;
-                    endSeminar > seminars.length ? setVisibleSeminars(seminars) :
-                    setVisibleSeminars(seminars.slice(0,endSeminar));
-                }
-            });
-            if (node) observer.current.observe(node);
-        },
-        [page, visibleSeminars]
-    );*/
+
+    useEffect(() => {
+        loadSeminars();
+    }, []);
+
+    useEffect(()=>{
+        checkHasMore();
+        hasMore && setVisibleSeminars();
+    }, [seminars, lastSeminarRef]);
+
+
 
     return (
         <div className="seminars">
 
             {showModal && <ModalWindow   /> }
+            {showInfo && <ModalWindow   /> }
             <h1>Семинары</h1>
 
             {loading ? <Preloader /> : (
-                seminars && seminars.length > 0 ? (
-                    seminars.map((seminar, index) => {
+                visibleSeminars && visibleSeminars.length > 0 ? ( isloadingVisibleSeminars ?
+                    visibleSeminars.map((seminar, index) => {
+                        const isLastSeminar = index === visibleSeminars.length - 1;
                         return (
-                            <div key={seminar.id}>
+                            <div key={seminar.id} ref={isLastSeminar ? lastSeminarRef : null}>
                                 <CardSeminar seminar={seminar} key={seminar.id} />
                             </div>
                         );
-                    })
+                    }) : <Preloader />
                 ) : (
-                    <div className="no-seminars">Нет семинаров</div>
+                    <div>Нет семинаров</div>
                 )
             )}
             {
@@ -92,21 +86,3 @@ const SeminarsList = observer(() => {
 });
 
 export default SeminarsList;
-
-
-/*
- {loading ? <Preloader /> : (
-                seminars && seminars.length > 0 ? (
-                    seminars.map((seminar, index) => {
-                        const isLastSeminar = index === seminars.length - 1;
-                        return (
-                            <div key={seminar.id} ref={isLastSeminar ? lastSeminarRef : null}>
-                                <CardSeminar seminar={seminar} key={seminar.id} />
-                            </div>
-                        );
-                    })
-                ) : (
-                    <div>Нет семинаров</div>
-                )
-            )}
- */

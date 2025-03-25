@@ -4,6 +4,7 @@ import {ISeminar} from "../store/SeminarsStore";
 import ModalWindow from "./ModalWindow";
 import {observer} from "mobx-react-lite";
 import Image from "./Image";
+import ModalInfo from "./ModalInfo";
 
 interface ICardSeminarProps {
     seminar: ISeminar;
@@ -12,11 +13,15 @@ interface ICardSeminarProps {
 const CardSeminar = observer(({seminar}: ICardSeminarProps) => {
 
     const {seminarsStore} = useRootStore();
-    const {deleteSeminar, updateSeminar, seminars, ToggleShowModal, showModal, updateNewUpdateSeminar} = seminarsStore;
+    const {deleteSeminar, updateSeminar, seminars,showInfo, toggleShowModal,toggleShowInfo, showModal, updateNewUpdateSeminar} = seminarsStore;
 
     const handleUpdateSeminar = () =>{
-        ToggleShowModal();
         updateNewUpdateSeminar(seminar);
+        toggleShowModal();
+    }
+    const handleDeleteSeminar = () => {
+        updateNewUpdateSeminar(seminar);
+        toggleShowInfo();
     }
 
 
@@ -37,7 +42,7 @@ const CardSeminar = observer(({seminar}: ICardSeminarProps) => {
                     </div>
 
                     <div className="seminars-cards-item-info-buttons">
-                        <Button title="Удалить" type="delete" fun={() => deleteSeminar(seminar.id)}/>
+                        <Button title="Удалить" type="delete" fun={handleDeleteSeminar}/>
                         <Button title="Редактировать" type="update" fun={handleUpdateSeminar}/>
                     </div>
                 </div>
